@@ -25,7 +25,7 @@ function git_dump($changeset) {
   }
 
   if(!is_dir(".git")) {
-    system("git init");
+    adv_exec("git init");
   }
 
   foreach($changeset->objects as $ob) {
@@ -37,17 +37,17 @@ function git_dump($changeset) {
       $orig_ob_path = get_class($ob) . "/" . $ob->orig_id . '.json';
 
       if($orig_ob_path != $ob_path)
-        system("git mv " . shell_escape("{$git_path}/{$orig_ob_path}") . " " . shell_escape("{$git_path}/{$ob_path}"));
+        adv_exec("git mv " . shell_escape("{$git_path}/{$orig_ob_path}") . " " . shell_escape("{$git_path}/{$ob_path}"));
 
     }
 
     file_put_contents($ob_path, json_readable_encode($ob->data()));
-    system("git add " . shell_escape("{$git_path}/{$ob_path}"));
+    adv_exec("git add " . shell_escape("{$git_path}/{$ob_path}"));
   }
 
   foreach($changeset->removed_objects as $ob) {
     $ob_path = get_class($ob) . "/" . $ob->id() . '.json';
-    system("git rm " . shell_escape("{$git_path}/{$ob_path}"));
+    adv_exec("git rm " . shell_escape("{$git_path}/{$ob_path}"));
   }
 
   global $auth;
