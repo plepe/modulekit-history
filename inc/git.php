@@ -14,6 +14,7 @@ function git_dump($changeset) {
 
   $cwd = getcwd();
 
+  $git_path = $git['path'];
   if(!file_exists($git['path'])) {
     mkdir($git['path']);
   }
@@ -27,19 +28,21 @@ function git_dump($changeset) {
     system("git init");
   }
 
-  system("rm -r *");
+  foreach($changeset->objects as $ob) {
+    $ob_path = get_class($ob) . "/" . $ob->id() . '.json';
 
-  mkdir("__system__");
+    @mkdir("{$git_path}/" . get_class($ob));
 
-  file_put_contents("__system__/__system__.json", json_readable_encode($system->data()) . "\n");
+    if($ob->orig_id !== null) {
+      $orig_ob_path = get_class($ob) . "/" . $ob->orig_id . '.json';
 
-  foreach(get_db_tables() as $table) {
-    file_put_contents("__system__/{$table->id}.json", json_readable_encode($table->data()) . "\n");
+      if($orig_ob_path != $ob_path)
+        system("git mv " . shell_escape("{$git_path}/{$orig_ob_path}") . " " . shell_escape("{$git_path}/{$ob_path}"));
 
-    mkdir($table->id);
-    foreach($table->get_entries() as $entry) {
-      file_put_contents("{$table->id}/{$entry->id}.json", json_readable_encode($entry->data()) . "\n");
     }
+
+    file_put_contents($ob_path, json_readable_encode($ob->data()));
+    system("git add " . shell_escape("{$git_path}/{$ob_path}"));
   }
 
   global $auth;
