@@ -45,6 +45,11 @@ function git_dump($changeset) {
     system("git add " . shell_escape("{$git_path}/{$ob_path}"));
   }
 
+  foreach($changeset->removed_objects as $ob) {
+    $ob_path = get_class($ob) . "/" . $ob->id() . '.json';
+    system("git rm " . shell_escape("{$git_path}/{$ob_path}"));
+  }
+
   global $auth;
   $user = $auth->current_user()->name();
   $email = $auth->current_user()->email();

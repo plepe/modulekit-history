@@ -6,6 +6,7 @@ class Changeset {
     $this->status = false;
     $this->message = $message;
     $this->objects = array();
+    $this->removed_objects = array();
 
     $db->beginTransaction();
   }
@@ -26,6 +27,15 @@ class Changeset {
 
   function add($object) {
     $this->objects[] = $object;
+
+    if($this->status === false) {
+      $this->open();
+      $this->commit();
+    }
+  }
+
+  function remove($object) {
+    $this->removed_objects[] = $object;
 
     if($this->status === false) {
       $this->open();
