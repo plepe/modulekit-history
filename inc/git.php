@@ -57,7 +57,6 @@ function git_dump($changeset) {
   if(!$email)
     $email = "unknown@unknown";
 
-  system("git add .");
   $result = adv_exec("git " .
            "-c user.name=" . shell_escape($user) . " " .
            "-c user.email=" . shell_escape($email) . " " .
