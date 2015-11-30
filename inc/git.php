@@ -73,4 +73,53 @@ function git_dump($changeset) {
   chdir($cwd);
 }
 
+function git_log_all() {
+  global $git;
+
+  if(!isset($git))
+    return;
+
+  $cwd = getcwd();
+
+  if(chdir($git['path']) === false) {
+    messages_add("Git: cannot chdir to git directory", MSG_ERROR);
+    return;
+  }
+
+  $ret = array();
+  $commit = null;
+  $result = adv_exec("git log --stat");
+  foreach(explode("\n", $result[1]) as $r) {
+    if(preg_match("/^commit (.*)/", $r, $m)) {
+      if($commit)
+        $ret[] = $commit;
+
+      $commit = array(
+        'commit' => $m[1],
+        'message' => '',
+        'objects' => array(),
+      );
+    }
+    elseif(preg_match("/^Author:\s*(.*) <(.*)>$/", $r, $m)) {
+      $commit['author_name'] = $m[1];
+      $commit['author_email'] = $m[1];
+    }
+    elseif(preg_match("/^Date:\s*(.*)$/", $r, $m)) {
+      $d = new DateTime($m[1]);
+      $commit['date'] = $d->format('c');
+    }
+    elseif(preg_match("/^    (.*)$/", $r, $m))
+      $commit['message'] .= $m[1];
+    elseif(preg_match("/^ ([A-Za-z0-9_]*)\/(.*)\.json/", $r, $m))
+      $commit['objects'][] = array($m[1], $m[2]);
+  }
+
+  if($commit)
+    $ret[] = $commit;
+
+  chdir($cwd);
+
+  return $ret;
+}
+
 register_hook("changeset_commit", "git_dump");
