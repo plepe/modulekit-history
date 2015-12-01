@@ -121,7 +121,7 @@ function _git_log_exec($cmd) {
     }
     elseif(preg_match("/^Author:\s*(.*) <(.*)>$/", $r, $m)) {
       $commit['author_name'] = $m[1];
-      $commit['author_email'] = $m[1];
+      $commit['author_email'] = $m[2];
     }
     elseif(preg_match("/^Date:\s*(.*)$/", $r, $m)) {
       $d = new DateTime($m[1]);
