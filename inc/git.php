@@ -73,7 +73,7 @@ function git_dump($changeset) {
   chdir($cwd);
 }
 
-function git_log_all() {
+function git_log_all($offset=0, $limit=null) {
   global $git;
 
   if(!isset($git))
@@ -88,7 +88,11 @@ function git_log_all() {
 
   $ret = array();
   $commit = null;
-  $result = adv_exec("git log --stat");
+  $result = adv_exec("git log --stat" .
+    ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
+    ($limit !== null ? " --max-count ". shell_escape($limit) : "")
+  );
+
   foreach(explode("\n", $result[1]) as $r) {
     if(preg_match("/^commit (.*)/", $r, $m)) {
       if($commit)
