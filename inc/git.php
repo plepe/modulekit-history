@@ -129,6 +129,10 @@ function _git_log_exec($cmd) {
     }
     elseif(preg_match("/^    (.*)$/", $r, $m))
       $commit['message'] .= $m[1];
+    elseif(preg_match("/^ ([A-Za-z0-9_]*)\/\{(.*)\.json => (.*)\.json\}/", $r, $m)) {
+
+      $commit['objects'][] = array($m[1], $m[3], $m[2]);
+    }
     elseif(preg_match("/^ ([A-Za-z0-9_]*)\/(.*)\.json/", $r, $m))
       $commit['objects'][] = array($m[1], $m[2]);
   }
