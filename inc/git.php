@@ -74,6 +74,24 @@ function git_dump($changeset) {
 }
 
 function git_log_all($offset=0, $limit=null) {
+  $cmd = "git log --stat" .
+    ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
+    ($limit !== null ? " --max-count ". shell_escape($limit) : "");
+
+  return _git_log_exec($cmd);
+}
+
+function git_log_object($class, $id, $offset=0, $limit=null) {
+  $cmd = "git log --stat --follow" .
+    ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
+    ($limit !== null ? " --max-count ". shell_escape($limit) : "") .
+    " " . shell_escape("{$class}/{$id}.json");
+
+  return _git_log_exec($cmd);
+}
+
+
+function _git_log_exec($cmd) {
   global $git;
 
   if(!isset($git))
@@ -88,10 +106,7 @@ function git_log_all($offset=0, $limit=null) {
 
   $ret = array();
   $commit = null;
-  $result = adv_exec("git log --stat" .
-    ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
-    ($limit !== null ? " --max-count ". shell_escape($limit) : "")
-  );
+  $result = adv_exec($cmd);
 
   foreach(explode("\n", $result[1]) as $r) {
     if(preg_match("/^commit (.*)/", $r, $m)) {
