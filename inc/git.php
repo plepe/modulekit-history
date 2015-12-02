@@ -144,7 +144,7 @@ function _git_log_exec($cmd) {
     }
     elseif(($mode == 0) && preg_match("/^ ([A-Za-z0-9_]*)\/(.*)\.json/", $r, $m))
       $commit['objects'][] = array($m[1], $m[2]);
-    elseif(($mode == 0) && preg_match("/^diff --git a\/([A-Za-z0-9_]*)\/(.*)\.json b\/([A-Za-z0-9_]*)\/(.*)\.json$/", $r, $m)) {
+    elseif((($mode == 0) || ($mode == 2)) && preg_match("/^diff --git a\/([A-Za-z0-9_]*)\/(.*)\.json b\/([A-Za-z0-9_]*)\/(.*)\.json$/", $r, $m)) {
       $mode = 1;
 
       if($m[2] != $m[4])
