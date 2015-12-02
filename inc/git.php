@@ -108,8 +108,10 @@ function _git_log_exec($cmd) {
   $commit = null;
   $result = adv_exec($cmd);
 
+  $mode = 0;
   foreach(explode("\n", $result[1]) as $r) {
     if(preg_match("/^commit (.*)/", $r, $m)) {
+      $mode = 0;
       if($commit)
         $ret[] = $commit;
 
@@ -119,22 +121,36 @@ function _git_log_exec($cmd) {
         'objects' => array(),
       );
     }
-    elseif(preg_match("/^Author:\s*(.*) <(.*)>$/", $r, $m)) {
+    elseif(($mode == 0) && preg_match("/^Author:\s*(.*) <(.*)>$/", $r, $m)) {
       $commit['author_name'] = $m[1];
       $commit['author_email'] = $m[2];
     }
-    elseif(preg_match("/^Date:\s*(.*)$/", $r, $m)) {
+    elseif(($mode == 0) && preg_match("/^Date:\s*(.*)$/", $r, $m)) {
       $d = new DateTime($m[1]);
       $commit['date'] = $d->format('c');
     }
-    elseif(preg_match("/^    (.*)$/", $r, $m))
+    elseif(($mode == 0) && preg_match("/^    (.*)$/", $r, $m))
       $commit['message'] .= $m[1];
-    elseif(preg_match("/^ ([A-Za-z0-9_]*)\/\{(.*)\.json => (.*)\.json\}/", $r, $m)) {
+    elseif(($mode == 0) && preg_match("/^ ([A-Za-z0-9_]*)\/\{(.*)\.json => (.*)\.json\}/", $r, $m)) {
 
       $commit['objects'][] = array($m[1], $m[3], $m[2]);
     }
-    elseif(preg_match("/^ ([A-Za-z0-9_]*)\/(.*)\.json/", $r, $m))
+    elseif(($mode == 0) && preg_match("/^ ([A-Za-z0-9_]*)\/(.*)\.json/", $r, $m))
       $commit['objects'][] = array($m[1], $m[2]);
+    elseif(($mode == 0) && preg_match("/^diff --git a\/([A-Za-z0-9_]*)\/(.*)\.json b\/([A-Za-z0-9_]*)\/(.*)\.json$/", $r, $m)) {
+      $mode = 1;
+
+      if($m[2] != $m[4])
+        $commit['objects'][] = array($m[1], $m[2], $m[4], 'diff' => "");
+      else
+        $commit['objects'][] = array($m[1], $m[2], 'diff' => "");
+    }
+    elseif(($mode == 1) && (preg_match("/^\@\@/", $r))) {
+      $mode = 2;
+    }
+    elseif($mode == 2) {
+      $commit['objects'][sizeof($commit['objects']) - 1]['diff'] .= "$r\n";
+    }
   }
 
   if($commit)
