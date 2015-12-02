@@ -41,7 +41,7 @@ function git_dump($changeset) {
 
     }
 
-    file_put_contents($ob_path, json_readable_encode($ob->data()));
+    file_put_contents($ob_path, json_readable_encode($ob->data()) . "\n");
     adv_exec("git add " . shell_escape("{$git_path}/{$ob_path}"));
   }
 
