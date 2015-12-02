@@ -90,6 +90,13 @@ function git_log_object($class, $id, $offset=0, $limit=null) {
   return _git_log_exec($cmd);
 }
 
+function git_log_commit($commit, $class=null, $id=null) {
+  $cmd = "git show -U99999 " . shell_escape($commit) .
+    ($class ? " --follow " . shell_escape("{$class}/{$id}.json") : "");
+
+  return _git_log_exec($cmd);
+}
+
 
 function _git_log_exec($cmd) {
   global $git;
