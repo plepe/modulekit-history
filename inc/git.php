@@ -51,8 +51,14 @@ function git_dump($changeset) {
   }
 
   global $auth;
-  $user = $auth->current_user()->name();
-  $email = $auth->current_user()->email();
+  if($auth && $auth->current_user()) {
+    $user = $auth->current_user()->name();
+    $email = $auth->current_user()->email();
+  }
+  else {
+    $user = "Unknown";
+    $email = "unknown@unknown";
+  }
 
   if(!$email)
     $email = "unknown@unknown";
