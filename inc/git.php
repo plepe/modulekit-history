@@ -91,14 +91,14 @@ function git_log_object($class, $id, $offset=0, $limit=null) {
   $cmd = "git log --stat --follow" .
     ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
     ($limit !== null ? " --max-count ". shell_escape($limit) : "") .
-    " " . shell_escape("{$class}/{$id}.json");
+    " -- " . shell_escape("{$class}/{$id}.json");
 
   return _git_log_exec($cmd);
 }
 
 function git_log_commit($commit, $class=null, $id=null) {
   $cmd = "git show -U99999 " . shell_escape($commit) .
-    ($class ? " --follow " . shell_escape("{$class}/{$id}.json") : "");
+    ($class ? " --follow -- " . shell_escape("{$class}/{$id}.json") : "");
 
   return _git_log_exec($cmd);
 }
