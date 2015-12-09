@@ -80,7 +80,7 @@ function git_dump($changeset) {
 }
 
 function git_log_all($offset=0, $limit=null) {
-  $cmd = "git log --stat" .
+  $cmd = "git log --stat --stat-name-width=1024" .
     ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
     ($limit !== null ? " --max-count ". shell_escape($limit) : "");
 
@@ -88,7 +88,7 @@ function git_log_all($offset=0, $limit=null) {
 }
 
 function git_log_object($class, $id, $offset=0, $limit=null) {
-  $cmd = "git log --stat --follow" .
+  $cmd = "git log --stat --stat-name-width=1024 --follow" .
     ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
     ($limit !== null ? " --max-count ". shell_escape($limit) : "") .
     " -- " . shell_escape("{$class}/{$id}.json");
