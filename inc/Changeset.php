@@ -25,6 +25,10 @@ class Changeset {
     unset($this->foreign_key_checks_disabled);
   }
 
+  function set_message($text) {
+    $this->message = $text;
+  }
+
   function add($object) {
     $this->objects[] = $object;
 
