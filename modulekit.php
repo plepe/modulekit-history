@@ -6,6 +6,7 @@ $depend = array(
   'hooks',
   'PDOext',
   'messages',
+  'shell_escape',
 );
 
 $include = array(
