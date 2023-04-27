@@ -37,17 +37,17 @@ function git_dump($changeset) {
       $orig_ob_path = get_class($ob) . "/" . $ob->orig_id . '.json';
 
       if($orig_ob_path != $ob_path)
-        adv_exec("git mv " . shell_escape("{$git_path}/{$orig_ob_path}") . " " . shell_escape("{$git_path}/{$ob_path}"));
+        adv_exec("git mv " . escapeshellarg("{$git_path}/{$orig_ob_path}") . " " . escapeshellarg("{$git_path}/{$ob_path}"));
 
     }
 
     file_put_contents($ob_path, json_readable_encode($ob->view()) . "\n");
-    adv_exec("git add " . shell_escape("{$git_path}/{$ob_path}"));
+    adv_exec("git add " . escapeshellarg("{$git_path}/{$ob_path}"));
   }
 
   foreach($changeset->removed_objects as $ob) {
     $ob_path = get_class($ob) . "/" . $ob->id() . '.json';
-    adv_exec("git rm " . shell_escape("{$git_path}/{$ob_path}"));
+    adv_exec("git rm " . escapeshellarg("{$git_path}/{$ob_path}"));
   }
 
   global $auth;
@@ -64,12 +64,12 @@ function git_dump($changeset) {
     $email = "unknown@unknown";
 
   $result = adv_exec("git " .
-           "-c user.name=" . shell_escape($user) . " " .
-           "-c user.email=" . shell_escape($email) . " " .
+           "-c user.name=" . escapeshellarg($user) . " " .
+           "-c user.email=" . escapeshellarg($email) . " " .
            "commit " .
-           "-a -m " . shell_escape($message) . " " .
+           "-a -m " . escapeshellarg($message) . " " .
            "--allow-empty-message ".
-           "--author=" . shell_escape("{$user} <{$email}>")
+           "--author=" . escapeshellarg("{$user} <{$email}>")
         );
 
   if(!in_array($result[0], array(0, 1))) {
@@ -81,24 +81,24 @@ function git_dump($changeset) {
 
 function git_log_all($offset=0, $limit=null) {
   $cmd = "git log --stat --stat-width=1024 --stat-name-width=1024" .
-    ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
-    ($limit !== null ? " --max-count ". shell_escape($limit) : "");
+    ($offset != 0 ? " --skip " . escapeshellarg($offset) : "") .
+    ($limit !== null ? " --max-count ". escapeshellarg($limit) : "");
 
   return _git_log_exec($cmd);
 }
 
 function git_log_object($class, $id, $offset=0, $limit=null) {
   $cmd = "git log --stat --stat-width=1024 --stat-name-width=1024 --follow" .
-    ($offset != 0 ? " --skip " . shell_escape($offset) : "") .
-    ($limit !== null ? " --max-count ". shell_escape($limit) : "") .
-    " -- " . shell_escape("{$class}/{$id}.json");
+    ($offset != 0 ? " --skip " . escapeshellarg($offset) : "") .
+    ($limit !== null ? " --max-count ". escapeshellarg($limit) : "") .
+    " -- " . escapeshellarg("{$class}/{$id}.json");
 
   return _git_log_exec($cmd);
 }
 
 function git_log_commit($commit, $class=null, $id=null) {
-  $cmd = "git show -U99999 " . shell_escape($commit) .
-    ($class ? " --follow -- " . shell_escape("{$class}/{$id}.json") : "");
+  $cmd = "git show -U99999 " . escapeshellarg($commit) .
+    ($class ? " --follow -- " . escapeshellarg("{$class}/{$id}.json") : "");
 
   return _git_log_exec($cmd);
 }
