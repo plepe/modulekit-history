@@ -30,7 +30,9 @@ class Changeset {
   }
 
   function add($object) {
-    $this->objects[] = $object;
+    if (!in_array($object, $this->objects)) {
+      $this->objects[] = $object;
+    }
 
     if($this->status === false) {
       $this->open();
@@ -39,7 +41,9 @@ class Changeset {
   }
 
   function remove($object) {
-    $this->removed_objects[] = $object;
+    if (!in_array($object, $this->removed_objects)) {
+      $this->removed_objects[] = $object;
+    }
 
     if($this->status === false) {
       $this->open();
