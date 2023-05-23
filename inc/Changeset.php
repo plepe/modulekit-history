@@ -73,6 +73,12 @@ class Changeset {
     $this->status = false;
     $db->commit();
 
+    foreach ($this->objects as $ob) {
+      if (method_exists($ob, 'on_commit')) {
+        $ob->on_commit($this);
+      }
+    }
+
     call_hooks("changeset_commit", $this);
   }
 
